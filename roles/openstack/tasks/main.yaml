@@ -1,0 +1,46 @@
+- name: Setup Openstack | Create User
+  become: yes
+  user:
+    name: stack
+    shell: /bin/bash
+    home: /opt/stack
+    groups: sudo
+    group: stack
+
+- name: Setup Openstack | update sudoers
+  become: yes
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    line: "%sudo	ALL=(ALL:ALL) NOPASSWD: ALL"
+    regexp: "^%sudo"
+
+- name: Setup Openstack | Install necessary software
+  become: yes
+  apt:
+    name: ['git']
+    state: present
+
+- name: Setup Openstack | checkout base
+  become: yes
+  git:
+    dest: /opt/stack/devstack
+    repo: https://git.openstack.org/openstack-dev/devstack
+
+- name: Setup Openstack | Correct ownership
+  become: yes
+  command: chown -R stack:stack /opt/stack/devstack
+
+- name: Setup Openstack | create local.conf
+  become: yes
+  template:
+    dest: /opt/stack/devstack/local.conf
+    src: local.conf
+    owner: stack
+    group: stack
+
+- name: Setup Openstack | start openstack
+  become: yes
+  command: su stack /opt/stack/devstack/stack.sh
+
+
