@@ -1,7 +1,6 @@
 - name: Install devstack
   hosts: servers
   gather_facts: yes
-  remote_user: nilsb
 
   roles:
     - openstack
